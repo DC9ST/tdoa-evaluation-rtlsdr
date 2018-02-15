@@ -18,7 +18,7 @@ function [ iq_corr ] = correlate_iq( iq1, iq2, corr_strategy, smoothing_factor )
             ref1 = max(xcorr(abs1_detrend, abs1_detrend));
             ref2 = max(xcorr(abs2_detrend, abs2_detrend));
             cor_max = max(abs_detrend_corr);
-            disp(['dphase Korrelation, max ' num2str(cor_max) ', ref1 = ' num2str(ref1) ', ref2= ' num2str(ref2) ', => ' num2str(100*2*cor_max / (ref1+ref2)) '%']);
+            disp(['abs Korrelation, max ' num2str(cor_max) ', ref1 = ' num2str(ref1) ', ref2= ' num2str(ref2) ', => ' num2str(100*2*cor_max / (ref1+ref2)) '%']);
             
             if smoothing_factor ~= 0 
                 abs_detrend_corr = smooth(abs(abs_detrend_corr), smoothing_factor);
