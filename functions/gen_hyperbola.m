@@ -1,11 +1,11 @@
-function [ points_lat, points_long ] = gen_hyperbola( doa_meters, rx1_lat, rx1_long, rx2_lat, rx2_long)
+function [ points_lat, points_long ] = gen_hyperbola( doa_meters, rx1_lat, rx1_long, rx2_lat, rx2_long, geo_ref_lat, geo_ref_long)
 %gen_hyperbola: calculates the points of a hyperbola from receiver positions
 %               and the doa in meters
   
     
     % convert to xy coordinates
-    [rx1_x, rx1_y] = latlong2xy_kl(rx1_lat, rx1_long);
-    [rx2_x, rx2_y] = latlong2xy_kl(rx2_lat, rx2_long);
+    [rx1_x, rx1_y] = latlong2xy(rx1_lat, rx1_long, geo_ref_lat, geo_ref_long);
+    [rx2_x, rx2_y] = latlong2xy(rx2_lat, rx2_long, geo_ref_lat, geo_ref_long);
 
 
     % mit Kosinussatz Dreieck berechnen
@@ -77,7 +77,7 @@ function [ points_lat, points_long ] = gen_hyperbola( doa_meters, rx1_lat, rx1_l
     points_long = zeros(hyp_points,1);
     
     for ii=1:1:hyp_points
-        [points_lat(ii), points_long(ii)] = xy2latlong_kl(hyp_x(ii), hyp_y(ii));
+        [points_lat(ii), points_long(ii)] = xy2latlong(hyp_x(ii), hyp_y(ii), geo_ref_lat, geo_ref_long);
     end
    
     disp(['Hyperbola with totally ' num2str(hyp_points) ' points generated.']);

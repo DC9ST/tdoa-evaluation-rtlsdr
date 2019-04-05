@@ -1,6 +1,6 @@
 % =========================================================================
 %  Experimental Evaluation Script for RTL-SDR based TDOA
-%  DC9ST, 2017
+%  DC9ST, 2017-2019
 % =========================================================================
 
 clear;
@@ -9,55 +9,46 @@ close all;
 
 % adds subfolder with functions to PATH
 [p,n,e] = fileparts(mfilename('fullpath'));
-addpath([p '\functions'])
+addpath([p '/functions']);
+addpath([p '/test']); % only required for the test setups
 
 
-%% Specify Parameters
+%% Read Parameters from config file, that specifies all parameters
+%---------------------------------------------
+%config;
 
-% RX and Ref TX Position
-rx1_lat = 49.441; % RX 1
-rx1_long = 7.767;
+%---------------------------------------------
+% Test modes:
+% for testing, generate html with configs below and compare output with
+% reference html in /test
+config_test;
+%config_test_fm;
+%config_test_other;
+% --------------------------------------------
 
-rx2_lat = 49.422; % RX 2
-rx2_long = 7.739;
+% create filenames
+dateiname1 = ['recorded_data/1_' file_identifier];
+dateiname2 = ['recorded_data/2_' file_identifier];
+dateiname3 = ['recorded_data/3_' file_identifier];
 
-rx3_lat = 49.425; % RX 3
-rx3_long = 7.756;
+% calculate geodetic reference point as mean center of all RX positions
+geo_ref_lat  = mean([rx1_lat, rx2_lat, rx3_lat]);
+geo_ref_long = mean([rx1_long, rx2_long, rx3_long]);
 
-tx_ref_lat = 49.45962; % Referenz: Rotenberg DAB
-tx_ref_long = 7.77116;
+%geo_ref_lat = 49.4; % geodetic reference point near Kaiserslautern (for plane approximation)
+%geo_ref_long = 7.7;
 
-% signal processing parameters
-signal_bandwidth_khz = 0;  % 400, 200, 40, 12, 0(no)
-smoothing_factor = 0;
-corr_type = 'dphase';  %'abs' or 'dphase'
-interpol_factor = 0;
-
-% 1: show correlation plots
-% 2: show also input spcetrograms and spectra of input meas
-% 3: show also before and after filtering
-report_level = 1;
-
-% heatmap
-heatmap_resolution = 400; % resolution for heatmap points
-heatmap_threshold = 0.1;  % heatmap point with lower mag are suppressed for html output
-
-% IQ Data Files
-file_identifier = 'test.dat';
-
-dateiname1 = ['recorded_data\1_' file_identifier];
-dateiname2 = ['recorded_data\2_' file_identifier];
-dateiname3 = ['recorded_data\3_' file_identifier];
+disp(['geodetic reference point (mean of RX positions): lat=' num2str(geo_ref_lat, 8) ', long=' num2str(geo_ref_long, 8) ])
 
 % known signal path differences between two RXes to Ref (sign of result is important!)
-rx_distance_diff12 = dist_latlong_kl(tx_ref_lat, tx_ref_long, rx1_lat, rx1_long) - dist_latlong_kl(tx_ref_lat, tx_ref_long, rx2_lat, rx2_long); % (Ref to RX1 - Ref to RX2) in meters
-rx_distance_diff13 = dist_latlong_kl(tx_ref_lat, tx_ref_long, rx1_lat, rx1_long) - dist_latlong_kl(tx_ref_lat, tx_ref_long, rx3_lat, rx3_long); % (Ref to RX1 - Ref to RX3) in meters
-rx_distance_diff23 = dist_latlong_kl(tx_ref_lat, tx_ref_long, rx2_lat, rx2_long) - dist_latlong_kl(tx_ref_lat, tx_ref_long, rx3_lat, rx3_long); % (Ref to RX2 - Ref to RX3) in meters
+rx_distance_diff12 = dist_latlong(tx_ref_lat, tx_ref_long, rx1_lat, rx1_long, geo_ref_lat, geo_ref_long) - dist_latlong(tx_ref_lat, tx_ref_long, rx2_lat, rx2_long, geo_ref_lat, geo_ref_long); % (Ref to RX1 - Ref to RX2) in meters
+rx_distance_diff13 = dist_latlong(tx_ref_lat, tx_ref_long, rx1_lat, rx1_long, geo_ref_lat, geo_ref_long) - dist_latlong(tx_ref_lat, tx_ref_long, rx3_lat, rx3_long, geo_ref_lat, geo_ref_long); % (Ref to RX1 - Ref to RX3) in meters
+rx_distance_diff23 = dist_latlong(tx_ref_lat, tx_ref_long, rx2_lat, rx2_long, geo_ref_lat, geo_ref_long) - dist_latlong(tx_ref_lat, tx_ref_long, rx3_lat, rx3_long, geo_ref_lat, geo_ref_long); % (Ref to RX2 - Ref to RX3) in meters
 
 % distance between two RXes in meters
-rx_distance12 = dist_latlong_kl(rx1_lat, rx1_long, rx2_lat, rx2_long);
-rx_distance13 = dist_latlong_kl(rx1_lat, rx1_long, rx3_lat, rx3_long);
-rx_distance23 = dist_latlong_kl(rx2_lat, rx2_long, rx3_lat, rx3_long);
+rx_distance12 = dist_latlong(rx1_lat, rx1_long, rx2_lat, rx2_long, geo_ref_lat, geo_ref_long);
+rx_distance13 = dist_latlong(rx1_lat, rx1_long, rx3_lat, rx3_long, geo_ref_lat, geo_ref_long);
+rx_distance23 = dist_latlong(rx2_lat, rx2_long, rx3_lat, rx3_long, geo_ref_lat, geo_ref_long);
 
 %% Read Signals from File
 disp('______________________________________________________________________________________________');
@@ -191,9 +182,9 @@ disp(' ');
 disp('______________________________________________________________________________________________');
 disp('GENERATE HYPERBOLAS');
 
-[points_lat1, points_long1] = gen_hyperbola(doa_meters12, rx1_lat, rx1_long, rx2_lat, rx2_long);
-[points_lat2, points_long2] = gen_hyperbola(doa_meters13, rx1_lat, rx1_long, rx3_lat, rx3_long);
-[points_lat3, points_long3] = gen_hyperbola(doa_meters23, rx2_lat, rx2_long, rx3_lat, rx3_long);
+[points_lat1, points_long1] = gen_hyperbola(doa_meters12, rx1_lat, rx1_long, rx2_lat, rx2_long, geo_ref_lat, geo_ref_long);
+[points_lat2, points_long2] = gen_hyperbola(doa_meters13, rx1_lat, rx1_long, rx3_lat, rx3_long, geo_ref_lat, geo_ref_long);
+[points_lat3, points_long3] = gen_hyperbola(doa_meters23, rx2_lat, rx2_long, rx3_lat, rx3_long, geo_ref_lat, geo_ref_long);
 
 disp(' ');
 disp('______________________________________________________________________________________________');
@@ -204,7 +195,7 @@ rx_long_positions = [rx1_long  rx2_long  rx3_long];
 hyperbola_lat_cell  = {points_lat1,  points_lat2, points_lat3};
 hyperbola_long_cell = {points_long1, points_long2, points_long3};
 
-[heatmap_long, heatmap_lat, heatmap_mag] = create_heatmap_kl(doa_meters12, doa_meters13, doa_meters23, rx1_lat, rx1_long, rx2_lat, rx2_long, rx3_lat, rx3_long, heatmap_resolution); % generate heatmap
+[heatmap_long, heatmap_lat, heatmap_mag] = create_heatmap(doa_meters12, doa_meters13, doa_meters23, rx1_lat, rx1_long, rx2_lat, rx2_long, rx3_lat, rx3_long, heatmap_resolution, geo_ref_lat, geo_ref_long); % generate heatmap
 heatmap_cell = {heatmap_long, heatmap_lat, heatmap_mag};
 
 create_html_file( ['ergebnisse/map_' file_identifier '_' corr_type '_interp' num2str(interpol_factor) '_bw' int2str(signal_bandwidth_khz) '_smooth' int2str(smoothing_factor) '.html'], rx_lat_positions, rx_long_positions, hyperbola_lat_cell, hyperbola_long_cell, heatmap_cell, heatmap_threshold);

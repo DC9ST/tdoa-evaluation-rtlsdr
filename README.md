@@ -1,4 +1,4 @@
-# Experimental Matlab Scripts for Evaluation of a TDOA System based on RTL-SDRs
+# Matlab Scripts for Evaluation of a TDOA System based on 3 RTL-SDRs
 
 ## Functionality:
 Matlab scripts according to my project on transmitter localization with time-difference-of-arrival (TDOA).
@@ -7,7 +7,9 @@ Matlab scripts according to my project on transmitter localization with time-dif
 
 [Presentation at the Software Defined Radio Academy, 2017](https://www.youtube.com/watch?v=Km4TU17b05s)
 
-The matlab scripts are in an experimental state (though fully operational) and provided "as they are".
+Update 2019:
+All algorithm parameters including the positions of the receivers etc. can be specified in the configuration .m file 
+The script is flexible and can be adapted to a 3-receiver scenario (with reference TX) anywhere.
 
 ### Input:
 Three recordings from (the three) receivers done with the librtlsdr-2freq (modified librtlsdr for 2 frequency operation).
@@ -21,6 +23,6 @@ First frequency is the reference transmitter, second frequency is the measuremen
 
 ### Output:
 A html/javascript file with a map showing the receivers, the hyperbolas and the most likely position of the transmitter.
-Note, that the earth's surface is approximated by a plane (cartesian grid). The geodetic reference point is near the city of Kaiserslautern, Germany.
+
 
 
