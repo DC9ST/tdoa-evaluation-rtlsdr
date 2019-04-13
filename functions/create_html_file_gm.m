@@ -1,6 +1,6 @@
-function [ output_args ] = create_html_file( filename, rx_lat, rx_long, hyperbola_lat, hyperbola_long, heatmap_cell, heatmap_threshold )
+function [ output_args ] = create_html_file_gm( filename, rx_lat, rx_long, hyperbola_lat, hyperbola_long, heatmap_cell, heatmap_threshold )
 %CREATE_HTML_FILE   Generates the html code for google maps showing RX
-%                   positions and the hyperbolas
+%                   positions and the hyperbolas with a heatmap
 %
 %   rx_lat:         list of latitudes for RX positions (for displaying receiver positions)
 %   rx_long:        list of longitudes for RX positions
@@ -8,7 +8,7 @@ function [ output_args ] = create_html_file( filename, rx_lat, rx_long, hyperbol
 %   hyperbola_lat:  cell array of longitudes for RX positions (one cell array elements correspond to one hyperbola)
 %   heatmap_cell:   cell array, that contains {1} = long vector, {2} = lat vector and {3} = magnitude of heatmap points vector
 
-    disp('writing html... ');
+    disp('writing html for google maps... ');
 
     % consistency checks
     if ~iscell(heatmap_cell)

@@ -34,10 +34,6 @@ dateiname3 = ['recorded_data/3_' file_identifier];
 % calculate geodetic reference point as mean center of all RX positions
 geo_ref_lat  = mean([rx1_lat, rx2_lat, rx3_lat]);
 geo_ref_long = mean([rx1_long, rx2_long, rx3_long]);
-
-%geo_ref_lat = 49.4; % geodetic reference point near Kaiserslautern (for plane approximation)
-%geo_ref_long = 7.7;
-
 disp(['geodetic reference point (mean of RX positions): lat=' num2str(geo_ref_lat, 8) ', long=' num2str(geo_ref_long, 8) ])
 
 % known signal path differences between two RXes to Ref (sign of result is important!)
@@ -198,6 +194,11 @@ hyperbola_long_cell = {points_long1, points_long2, points_long3};
 [heatmap_long, heatmap_lat, heatmap_mag] = create_heatmap(doa_meters12, doa_meters13, doa_meters23, rx1_lat, rx1_long, rx2_lat, rx2_long, rx3_lat, rx3_long, heatmap_resolution, geo_ref_lat, geo_ref_long); % generate heatmap
 heatmap_cell = {heatmap_long, heatmap_lat, heatmap_mag};
 
-create_html_file( ['ergebnisse/map_' file_identifier '_' corr_type '_interp' num2str(interpol_factor) '_bw' int2str(signal_bandwidth_khz) '_smooth' int2str(smoothing_factor) '.html'], rx_lat_positions, rx_long_positions, hyperbola_lat_cell, hyperbola_long_cell, heatmap_cell, heatmap_threshold);
-
+if strcmp(map_mode, 'google_maps')
+    % for google maps
+    create_html_file_gm( ['ergebnisse/map_' file_identifier '_' corr_type '_interp' num2str(interpol_factor) '_bw' int2str(signal_bandwidth_khz) '_smooth' int2str(smoothing_factor) '_gm.html'], rx_lat_positions, rx_long_positions, hyperbola_lat_cell, hyperbola_long_cell, heatmap_cell, heatmap_threshold);
+else
+    % for open street map
+    create_html_file_osm( ['ergebnisse/map_' file_identifier '_' corr_type '_interp' num2str(interpol_factor) '_bw' int2str(signal_bandwidth_khz) '_smooth' int2str(smoothing_factor) '_osm.html'], rx_lat_positions, rx_long_positions, hyperbola_lat_cell, hyperbola_long_cell, heatmap_cell, heatmap_threshold);
+end
 disp('______________________________________________________________________________________________');

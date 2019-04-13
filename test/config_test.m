@@ -31,6 +31,10 @@ interpol_factor = 0;
 % 3: show also before and after filtering
 report_level = 0;
 
-% heatmap
+% map output
+% 'open_street_map' (default) or 'google_maps'
+map_mode = 'open_street_map';
+
+% heatmap (only with google maps)
 heatmap_resolution = 400; % resolution for heatmap points
 heatmap_threshold = 0.1;  % heatmap point with lower mag are suppressed for html output
