@@ -1,6 +1,6 @@
 function [ reliability ] = corr_reliability( correlation )
 %corr_reliability calculates reliability 0..1 of the correlation result
-%   Looks for 2nd highest oustanding PEAK (not sample!) and returns  "1 - amplitude percentage in comparison to main peak"
+%   Looks for 2nd highest outstanding PEAK (not sample!) and returns  "1 - amplitude percentage in comparison to main peak"
 %	e.g. main peak 10, 2nd peak 3 -> output: 0.7
 
     [corr_max, idx] = max(correlation);

@@ -14,7 +14,7 @@ function [ doa_meters, doa_samples, reliability ] = tdoa2(signal1_complex, signa
     %	corr_type: 			switch between abs and delta phase (abs: 0, delta phase: 1);
     %	report_level:		no reports: 0, show figures >0
     %   signal_bandwidth_khz bandwidth of FIR filter for signal filtering applied to meas signal (400, 200, 40, 12, 0)
-    %   interpol            interpolation factor 
+    %   interpol            interpolation factor (0 or 1 = no interpolation)
     %
     %   requirement: signal capture with 2 Msps:
     
@@ -94,8 +94,11 @@ function [ doa_meters, doa_samples, reliability ] = tdoa2(signal1_complex, signa
         grid;
     end
     
+
     
     %% Correlation for slice 1 (ref)
+    disp('CORRELATION CALCULATION DETAILS:');
+    
     % native
     corr_signal_1 = correlate_iq(signal11_complex, signal21_complex, corr_type, 0);
     corr1_reliability = corr_reliability( corr_signal_1 );
@@ -213,8 +216,10 @@ function [ doa_meters, doa_samples, reliability ] = tdoa2(signal1_complex, signa
         figure('units','normalized','outerposition',[0 0 1 1]);
         subplot(4,2,1);
         
-        x_corr_interp = 1:(2*interpol*length(signal11_complex) - 1);
-        x_corr_interp_plot = (x_corr_interp-1)./interpol +(1/interpol);
+        if (interpol > 1) 
+            x_corr_interp = 1:(2*interpol*length(signal11_complex) - 1);
+            x_corr_interp_plot = (x_corr_interp-1)./interpol +(1/interpol);
+        end
         
         plot(1:length(corr_signal_1), corr_signal_1, 1:length(corr_signal_3), corr_signal_3,...
             1:length(corr_signal_2), delay_mask, 'r', idx1, corr_signal_1(idx1),'dr', idx3, corr_signal_3(idx3),'dr');
@@ -360,10 +365,10 @@ function [ doa_meters, doa_samples, reliability ] = tdoa2(signal1_complex, signa
         disp('<strong>WARNING: BAD REFERENCE SIGNALS: ref delays differ by more than 2 samples! </strong>');
         if corr1_reliability > corr3_reliability
             avg_delay13 = delay1;
-            disp(['<strong>taking delay1 (reliability: ' num2str(corr1_reliability) '(1) > ' num2str(corr3_reliability) '(3) </strong>']);
+            disp(['<strong>taking ref with higher reliability, i.e. ref (reliability: ' num2str(corr1_reliability) '(ref) > ' num2str(corr3_reliability) '(ref check) </strong>']);
         else
             avg_delay13 = delay3;
-            disp(['<strong>taking delay3 (reliability: ' num2str(corr1_reliability) '(1) < ' num2str(corr3_reliability) '(3) </strong>']);
+            disp(['<strong>taking ref with higher reliability, i.e. ref check (reliability: ' num2str(corr1_reliability) '(ref) < ' num2str(corr3_reliability) '(ref check) </strong>']);
         end
         
     end
@@ -384,7 +389,7 @@ function [ doa_meters, doa_samples, reliability ] = tdoa2(signal1_complex, signa
     disp(['raw delay1 (ref) (nativ/interp): ' int2str(delay1_native) ' / ' num2str(delay1_interp) ', reliability nativ (0..1): ' num2str(corr1_reliability)]);
     disp(['raw delay2 (measure) (nativ/interp): ' int2str(delay2_native) ' / ' num2str(delay2_interp) ', reliability nativ: ' num2str(corr2_reliability)]);
     disp(['raw delay3 (ref check) (nativ/interp): ' int2str(delay3_native) ' / ' num2str(delay3_interp) ', reliability nativ: ' num2str(corr3_reliability)]);
-    disp(['avg raw delay ref/ref check: ' num2str(avg_delay13) ]);
+    disp(['merged delay of ref and ref check: ' num2str(avg_delay13) ]);
     disp(' ');
 
     disp(['specified distance difference to ref tx [m]: ' int2str(rx_distance_diff)]);
@@ -392,9 +397,10 @@ function [ doa_meters, doa_samples, reliability ] = tdoa2(signal1_complex, signa
     disp(['specified distance between two RXes [m]: ' num2str(rx_distance)]);
     disp(' ');
 
+    disp('FINAL RESULT');
     disp(['TDOA in samples: ' num2str(doa_samples) '(how much is signal1 later than signal2)']);
     disp(['TDOA in distance [m]: ' num2str(doa_meters) ]);
-    disp(['Total Reliability (min): ' num2str(reliability) ]);
+    disp(['Total Reliability (min of all 3): ' num2str(reliability) ]);
     disp(' ');
 end
 

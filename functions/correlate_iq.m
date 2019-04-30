@@ -18,7 +18,7 @@ function [ iq_corr ] = correlate_iq( iq1, iq2, corr_strategy, smoothing_factor )
             ref1 = max(xcorr(abs1, abs1));
             ref2 = max(xcorr(abs2, abs2));
             cor_max = max(abs_corr);
-            disp(['abs Korrelation, max ' num2str(cor_max) ', ref1 = ' num2str(ref1) ', ref2= ' num2str(ref2) ', => ' num2str(100*2*cor_max / (ref1+ref2)) '%']);
+            disp(['abs cross-correlation: max (peak) ' num2str(cor_max,3) ', autocorr1 max ' num2str(ref1,3) ', autocorr2 max ' num2str(ref2,3) ', => ' num2str(100*2*cor_max / (ref1+ref2)) '%']);
             
             if smoothing_factor ~= 0 
                 abs_corr = smooth(abs(abs_corr), smoothing_factor);
@@ -42,7 +42,7 @@ function [ iq_corr ] = correlate_iq( iq1, iq2, corr_strategy, smoothing_factor )
             ref1 = max(xcorr(d_phase1, d_phase1));
             ref2 = max(xcorr(d_phase2, d_phase2));
             cor_max = max(d_phase_corr);
-            disp(['dphase Korrelation, max ' num2str(cor_max) ', ref1 = ' num2str(ref1) ', ref2= ' num2str(ref2) ', => ' num2str(100*2*cor_max / (ref1+ref2)) '%'  ]);
+            disp(['dphase cross-correlation, max (peak) ' num2str(cor_max,3) ', autocorr1 max ' num2str(ref1,3) ', autocorr2 max ' num2str(ref2,3) ', => ' num2str(100*2*cor_max / (ref1+ref2)) '%'  ]);
             
             if smoothing_factor ~= 0 
                 d_phase_corr = smooth(abs(d_phase_corr), smoothing_factor);
