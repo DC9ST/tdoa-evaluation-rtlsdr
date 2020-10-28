@@ -1,4 +1,6 @@
-function [ doa_meters, doa_samples, reliability ] = tdoa2(signal1_complex, signal2_complex, rx_distance_diff, rx_distance, smoothing_factor, corr_type,  report_level, signal_bandwidth_khz, interpol)
+function [ doa_meters, doa_samples, reliability ] = tdoa2(signal1_complex, signal2_complex, rx_distance_diff, rx_distance, ...
+                                                          smoothing_factor, corr_type,  report_level, signal_bandwidth_khz, ...
+                                                          ref_bandwidth_khz, smoothing_factor_ref, interpol)
     % tdoa2 calculates the TDOA of two signals captured by two RXs
     %	output:
     %   doa_meters: 		delay in meters (how much signal1 is later than signal 2)
@@ -61,7 +63,13 @@ function [ doa_meters, doa_samples, reliability ] = tdoa2(signal1_complex, signa
     
     signal12_complex = filter_iq(signal12_complex, signal_bandwidth_khz);
     signal22_complex = filter_iq(signal22_complex, signal_bandwidth_khz);
-    
+
+    %% Filter Ref Signal
+    signal11_complex = filter_iq(signal11_complex, ref_bandwidth_khz);
+    signal13_complex = filter_iq(signal13_complex, ref_bandwidth_khz);
+    signal21_complex = filter_iq(signal21_complex, ref_bandwidth_khz);
+    signal23_complex = filter_iq(signal23_complex, ref_bandwidth_khz);
+
     disp(' ');
     
     
@@ -78,7 +86,7 @@ function [ doa_meters, doa_samples, reliability ] = tdoa2(signal1_complex, signa
         
         freq_axis = -(length(spectrum1)/2) : 1 : ((length(spectrum1)/2)-1);
         plot(freq_axis, spectrum1, freq_axis, spectrum2);
-        title('Measurement Signal 1 & 2, unfiltered');
+        title('Measurement Signals, before filtering');
         grid;
         
         subplot(2,1,2);
@@ -90,17 +98,16 @@ function [ doa_meters, doa_samples, reliability ] = tdoa2(signal1_complex, signa
         
         freq_axis = -(length(spectrum1)/2) : 1 : ((length(spectrum1)/2)-1);
         plot(freq_axis, spectrum1, freq_axis, spectrum2);
-        title('Measurement Signal 1 & 2, filtered');
+        title('Measurement Signals, after filtering');
         grid;
     end
     
-
     
     %% Correlation for slice 1 (ref)
     disp('CORRELATION CALCULATION DETAILS:');
     
     % native
-    corr_signal_1 = correlate_iq(signal11_complex, signal21_complex, corr_type, 0);
+    corr_signal_1 = correlate_iq(signal11_complex, signal21_complex, corr_type, smoothing_factor_ref);
     corr1_reliability = corr_reliability( corr_signal_1 );
 
     [~, idx1] = max(corr_signal_1);
@@ -111,7 +118,7 @@ function [ doa_meters, doa_samples, reliability ] = tdoa2(signal1_complex, signa
         signal11_interp = interp(signal11_complex, interpol);
         signal12_interp = interp(signal21_complex, interpol);
     
-        corr_signal_1_interp = correlate_iq(signal11_interp, signal12_interp, corr_type, 0);
+        corr_signal_1_interp = correlate_iq(signal11_interp, signal12_interp, corr_type, smoothing_factor_ref);
         [~, idx1_interp_i] = max(corr_signal_1_interp);
         idx1_interp = (idx1_interp_i-1) ./ interpol + (1/interpol);
         delay1_interp = idx1_interp - length(signal11_complex); % >0: signal1 later, <0 signal2 later
@@ -188,7 +195,7 @@ function [ doa_meters, doa_samples, reliability ] = tdoa2(signal1_complex, signa
     
     %% Correlation for slice 3 (ref check)
     %native
-    corr_signal_3 = correlate_iq(signal13_complex, signal23_complex, corr_type, 0);
+    corr_signal_3 = correlate_iq(signal13_complex, signal23_complex, corr_type, smoothing_factor_ref);
     corr3_reliability = corr_reliability(corr_signal_3);
 
     [~, idx3] = max(corr_signal_3);
@@ -199,7 +206,7 @@ function [ doa_meters, doa_samples, reliability ] = tdoa2(signal1_complex, signa
         signal13_interp = interp(signal13_complex, interpol);
         signal23_interp = interp(signal23_complex, interpol);
 
-        corr_signal_3_interp = correlate_iq(signal13_interp, signal23_interp, corr_type, 0);
+        corr_signal_3_interp = correlate_iq(signal13_interp, signal23_interp, corr_type, smoothing_factor_ref);
         [~, idx3_interp_i] = max(corr_signal_3_interp);
         idx3_interp = (idx3_interp_i-1) ./ interpol + (1/interpol);
         delay3_interp = idx3_interp - length(signal13_complex); % >0: signal1 later, <0 signal2 later

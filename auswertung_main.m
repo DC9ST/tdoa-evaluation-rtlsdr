@@ -160,17 +160,23 @@ end;
 disp(' ');
 disp('______________________________________________________________________________________________');
 disp('CORRELATION 1 & 2');
-[doa_meters12, doa_samples12, reliability12 ] = tdoa2(signal1, signal2, rx_distance_diff12, rx_distance12, smoothing_factor, corr_type, report_level, signal_bandwidth_khz, interpol_factor);
+[doa_meters12, doa_samples12, reliability12 ] = tdoa2(signal1, signal2, rx_distance_diff12, rx_distance12, ...
+                                                      smoothing_factor, corr_type, report_level, signal_bandwidth_khz, ...
+                                                      ref_bandwidth_khz, smoothing_factor_ref, interpol_factor);
 
 disp(' ');
 disp('______________________________________________________________________________________________');
 disp('CORRELATION 1 & 3');
-[doa_meters13, doa_samples13, reliability13 ] = tdoa2(signal1, signal3, rx_distance_diff13, rx_distance13, smoothing_factor, corr_type, report_level, signal_bandwidth_khz, interpol_factor);
+[doa_meters13, doa_samples13, reliability13 ] = tdoa2(signal1, signal3, rx_distance_diff13, rx_distance13, ...
+                                                      smoothing_factor, corr_type, report_level, signal_bandwidth_khz, ...
+                                                      ref_bandwidth_khz, smoothing_factor_ref, interpol_factor);
 
 disp(' ');
 disp('______________________________________________________________________________________________');
 disp('CORRELATION 2 & 3');
-[doa_meters23, doa_samples23, reliability23 ] = tdoa2(signal2, signal3, rx_distance_diff23, rx_distance23, smoothing_factor, corr_type, report_level, signal_bandwidth_khz, interpol_factor);
+[doa_meters23, doa_samples23, reliability23 ] = tdoa2(signal2, signal3, rx_distance_diff23, rx_distance23, ...
+                                                      smoothing_factor, corr_type, report_level, signal_bandwidth_khz, ...
+                                                      ref_bandwidth_khz, smoothing_factor_ref, interpol_factor);
 
 
 %% Generate html map

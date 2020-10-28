@@ -25,6 +25,11 @@ smoothing_factor = 0;
 corr_type = 'dphase';  %'abs' or 'dphase'
 interpol_factor = 0;
 
+% additional processing of ref signal
+%(set to > 0 only when other signals than the ref signal falls into the full RX bandwidth)
+ref_bandwidth_khz = 0; % 400, 200, 40, 12, 0(no)
+smoothing_factor_ref = 0;
+
 % 0: no plots
 % 1: show correlation plots
 % 2: show also input spcetrograms and spectra of input meas
