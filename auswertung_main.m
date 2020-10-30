@@ -78,7 +78,7 @@ end
 if (report_level > 1)
     % calculate and show spectrogram
     nfft = 256;
-    overlap = -1000;
+    overlap = 8;
     
     figure;
     subplot(4,2,1);
